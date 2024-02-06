@@ -65,8 +65,6 @@ def filter2d(image, filter):
     Returns:
         out: numpy array of shape (Hi, Wi)
     """
-
-    out = None
     Hi, Wi = image.shape
     Hk, Wk = filter.shape
     out = np.zeros((Hi, Wi))
@@ -76,7 +74,28 @@ def filter2d(image, filter):
         for n in range(Wi):
             out[m, n] = np.sum((image[m:m+Hk, n:n+Wk])*filter)
     return out
-    
+
+
+def filter2d_color(image, filter):
+    """
+    Apply the 2D filter to each channel of a color image separately.
+
+    Args:
+        image: numpy array of shape (Hi, Wi, 3) for a color image.
+        filter: numpy array of shape (Hk, Wk) representing the filter.
+
+    Returns:
+        out: numpy array of shape (Hi, Wi, 3) with the filter applied to each channel.
+    """
+    # Initialize the output image with zeros, with the same shape as the input image.
+    out = np.zeros_like(image)
+
+    # Apply the filter to each channel separately.
+    for i in range(3):  # Assuming the third dimension is the channel.
+        out[:, :, i] = filter2d(image[:, :, i], filter)
+
+    return out
+
 
 def partial_x(img):
     """ Computes partial x-derivative of input img.
