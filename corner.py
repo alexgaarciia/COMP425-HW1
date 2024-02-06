@@ -1,14 +1,15 @@
 import numpy as np
-from utils import filter2d, partial_x, partial_y
+from utils import gaussian_kernel, filter2d, partial_x, partial_y
 from skimage.feature import peak_local_max
 from skimage.io import imread
 import matplotlib.pyplot as plt
+
 
 def harris_corners(img, window_size=3, k=0.04):
     """
     Compute Harris corner response map. Follow the math equation
     R=Det(M)-k(Trace(M)^2).
-        
+
     Args:
         img: Grayscale image of shape (H, W)
         window_size: size of the window function
@@ -17,29 +18,67 @@ def harris_corners(img, window_size=3, k=0.04):
     Returns:
         response: Harris response image of shape (H, W)
     """
+    # In order to compute the Harris Corner Detection Algorithm, there are some steps that must be followed:
+    # STEP 1: Compute gradients
+    Ix = partial_x(img)
+    Iy = partial_y(img)
 
-    response = None
-    
-    ### YOUR CODE HERE
+    # STEP 2: Compute products of derivatives at every pixel
+    Ixx = Ix**2
+    Ixy = Ix*Iy
+    Iyy = Iy**2
 
-    ### END YOUR CODE
+    # STEP 3: Apply Gaussian filter to weighted derivatives
+    g_kernel = gaussian_kernel(window_size, sig=1)
+    Sxx = filter2d(Ixx, g_kernel)
+    Sxy = filter2d(Ixy, g_kernel)
+    Syy = filter2d(Iyy, g_kernel)
 
+    # STEP 4: Compute corner response R=Det(M)-k(Trace(M)^2) at each pixel
+    detM = Sxx * Syy - Sxy**2
+    traceM = Sxx + Syy
+    response = detM - k * traceM**2
     return response
 
+
 def main():
+    # Load image
     img = imread('building.jpg', as_gray=True)
 
-    ### YOUR CODE HERE
-    
     # Compute Harris corner response
+    response = harris_corners(img)
 
     # Threshold on response
+    threshold = np.max(response) * 0.01
+    response_thresholded = response > threshold
 
     # Perform non-max suppression by finding peak local maximum
+    coordinates = peak_local_max(response, min_distance=5, threshold_rel=threshold)
 
     # Visualize results
-    
-    ### END YOUR CODE
-    
+    plt.figure(figsize=(15, 5))
+
+    # Visualize response map before thresholding
+    plt.subplot(1, 3, 1)
+    plt.imshow(response, cmap='hot')
+    plt.title('Harris Response Map')
+    plt.axis('off')
+
+    # Visualize response map after thresholding
+    plt.subplot(1, 3, 2)
+    plt.imshow(response_thresholded, cmap='hot')
+    plt.title('Thresholded Response Map')
+    plt.axis('off')
+
+    # Visualize detected corners on the image
+    plt.subplot(1, 3, 3)
+    plt.imshow(img, cmap='gray')
+    plt.scatter(coordinates[:, 1], coordinates[:, 0], s=10, color='red', marker='x')
+    plt.title('Detected Corners')
+    plt.axis('off')
+
+    plt.show()
+
+
 if __name__ == "__main__":
     main()
