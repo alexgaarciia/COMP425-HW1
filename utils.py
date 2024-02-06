@@ -1,13 +1,25 @@
 import numpy as np
 
+
 def gaussian_kernel(l=5, sig=1.):
     """
     creates gaussian kernel with side length `l` and a sigma of `sig`
     """
+    # Create an array of values that spans the range needed to construct one axis of the kernel.
+    # It centers the axis at 0, which is crucial for a symmetric Gaussian kernel.
     ax = np.linspace(-(l - 1) / 2., (l - 1) / 2., l)
+
+    # Applies the Gaussian function to every element of the array "ax". This operation generates the 1D Gaussian distribution.
     gauss = np.exp(-0.5 * np.square(ax) / np.square(sig))
+
+    # Calculates the outer product of the "gauss" array with itself to form a 2D Gaussian kernel. This step effectively
+    # spreads the 1D Gaussian distribution across two dimensions.
     kernel = np.outer(gauss, gauss)
+
+    # Finally, it normalizes the kernel so that its sum equals 1. This ensures that applying the kernel to an image does
+    # not change the overall brightness of the image.
     return kernel / np.sum(kernel)
+
     
 def zero_pad(image, pad_height, pad_width):
     """ 
@@ -62,10 +74,7 @@ def filter2d(image, filter):
     image = zero_pad(image, Hk//2, Wk//2)
     for m in range(Hi):
         for n in range(Wi):
-            ### YOUR CODE HERE (replace ??? with your code)
-            out[m, n] = ???
-            ### END YOUR CODE
-
+            out[m, n] = np.sum((image[m:m+Hk, n:n+Wk])*filter)
     return out
     
 
@@ -77,16 +86,15 @@ def partial_x(img):
     Returns:
         out: x-derivative image
     """
+    # Sobel x-axis kernel
+    kernel_x = np.array([[-1, 0, 1],
+                        [-2, 0, 2],
+                        [-1, 0, 1]])
 
-    out = None
-    
-    ### YOUR CODE HERE
-
-    # define your derivative filter to be size 3*3
-    
-    ### END YOUR CODE
-
+    # Apply the x-derivative filter using the filter2d function
+    out = filter2d(img, kernel_x)
     return out
+
 
 def partial_y(img):
     """ Computes partial y-derivative of input img.
@@ -96,13 +104,11 @@ def partial_y(img):
     Returns:
         out: y-derivative image
     """
+    # Sobel y-axis kernel
+    kernel_y = np.array([[-1, -2, -1],
+                         [0, 0, 0],
+                         [1, 2, 1]])
 
-    out = None
-    
-    ### YOUR CODE HERE
-
-    # define your derivative filter to be size 3*3
-    
-    ### END YOUR CODE
-
+    # Apply the y-derivative filter using the filter2d function
+    out = filter2d(img, kernel_y)
     return out
