@@ -65,35 +65,27 @@ def filter2d(image, filter):
     Returns:
         out: numpy array of shape (Hi, Wi)
     """
-    Hi, Wi = image.shape
-    Hk, Wk = filter.shape
-    out = np.zeros((Hi, Wi))
+    # Check if the image is grayscale or color:
+    if len(image.shape) == 2:
+        # Grayscale image
+        Hi, Wi = image.shape
+        Hk, Wk = filter.shape
+        out = np.zeros((Hi, Wi))
 
-    image = zero_pad(image, Hk//2, Wk//2)
-    for m in range(Hi):
-        for n in range(Wi):
-            out[m, n] = np.sum((image[m:m+Hk, n:n+Wk])*filter)
-    return out
-
-
-def filter2d_color(image, filter):
-    """
-    Apply the 2D filter to each channel of a color image separately.
-
-    Args:
-        image: numpy array of shape (Hi, Wi, 3) for a color image.
-        filter: numpy array of shape (Hk, Wk) representing the filter.
-
-    Returns:
-        out: numpy array of shape (Hi, Wi, 3) with the filter applied to each channel.
-    """
-    # Initialize the output image with zeros, with the same shape as the input image.
-    out = np.zeros_like(image)
-
-    # Apply the filter to each channel separately.
-    for i in range(3):  # Assuming the third dimension is the channel.
-        out[:, :, i] = filter2d(image[:, :, i], filter)
-
+        image = zero_pad(image, Hk//2, Wk//2)
+        for m in range(Hi):
+            for n in range(Wi):
+                out[m, n] = np.sum((image[m:m+Hk, n:n+Wk])*filter)
+    else:
+        # Color image
+        Hi, Wi, Ci = image.shape
+        out = np.zeros((Hi, Wi, Ci))
+        for c in range(Ci):
+            image_channel = image[:, :, c]
+            image_padded = zero_pad(image_channel, filter.shape[0]//2, filter.shape[1]//2)
+            for m in range(Hi):
+                for n in range(Wi):
+                    out[m, n, c] = np.sum(image_padded[m:m+filter.shape[0], n:n+filter.shape[1]] * filter)
     return out
 
 

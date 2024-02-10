@@ -1,7 +1,7 @@
 import numpy as np
 from skimage.io import imread
 import matplotlib.pyplot as plt
-from utils import gaussian_kernel, filter2d, filter2d_color
+from utils import gaussian_kernel, filter2d
 
 
 def main():
@@ -29,7 +29,7 @@ def main():
     for i in range(N_levels):
         # Apply Gaussian filter to smooth the image before subsampling
         kernel = gaussian_kernel()
-        im_smoothed = filter2d_color(im_subsample, kernel)  # Use the modified filter2d function
+        im_smoothed = filter2d(im_subsample, kernel)  # Use the modified filter2d function
 
         # Subsample the smoothed image
         im_subsample = im_smoothed[::2, ::2, :]
