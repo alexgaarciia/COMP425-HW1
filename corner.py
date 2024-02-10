@@ -1,5 +1,5 @@
 import numpy as np
-from utils import gaussian_kernel, filter2d, partial_x, partial_y
+from utils import filter2d, partial_x, partial_y
 from skimage.feature import peak_local_max
 from skimage.io import imread
 import matplotlib.pyplot as plt
@@ -28,11 +28,12 @@ def harris_corners(img, window_size=3, k=0.04):
     Ixy = Ix*Iy
     Iyy = Iy**2
 
-    # STEP 3: Apply Gaussian filter to weighted derivatives
-    g_kernel = gaussian_kernel(window_size, sig=1)
-    Sxx = filter2d(Ixx, g_kernel)
-    Sxy = filter2d(Ixy, g_kernel)
-    Syy = filter2d(Iyy, g_kernel)
+    # STEP 3: Apply a filter to weighted derivatives
+    kernel_value = 1 / window_size*window_size
+    kernel = np.full((window_size, window_size), kernel_value)
+    Sxx = filter2d(Ixx, kernel)
+    Sxy = filter2d(Ixy, kernel)
+    Syy = filter2d(Iyy, kernel)
 
     # STEP 4: Compute corner response R=Det(M)-k(Trace(M)^2) at each pixel
     detM = Sxx * Syy - Sxy**2
@@ -53,7 +54,7 @@ def main():
     response_thresholded = response > threshold
 
     # Perform non-max suppression by finding peak local maximum
-    coordinates = peak_local_max(response, min_distance=5, threshold_rel=threshold)
+    coordinates = peak_local_max(response, min_distance=5, threshold_abs=threshold)
 
     # Visualize results
     plt.figure(figsize=(15, 5))
