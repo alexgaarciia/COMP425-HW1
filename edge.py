@@ -1,3 +1,4 @@
+# Import necessary libraries/functions
 import numpy as np
 import matplotlib.pylab as plt
 from skimage import io
@@ -12,7 +13,7 @@ def main():
     kernel = gaussian_kernel()
     smoothed_im = filter2d(img, kernel)
 
-    # Compute x and y derivate on smoothed image
+    # Compute x and y derivative on smoothed image
     grad_x = partial_x(smoothed_im)
     grad_y = partial_y(smoothed_im)
 

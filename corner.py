@@ -1,3 +1,4 @@
+# Import necessary libraries/functions
 import numpy as np
 from utils import filter2d, partial_x, partial_y
 from skimage.feature import peak_local_max
@@ -19,7 +20,7 @@ def harris_corners(img, window_size=3, k=0.04):
         response: Harris response image of shape (H, W)
     """
     # In order to compute the Harris Corner Detection Algorithm, there are some steps that must be followed:
-    # STEP 1: Compute gradients
+    # STEP 1: Compute x and y derivatives of the image
     Ix = partial_x(img)
     Iy = partial_y(img)
 
@@ -28,17 +29,20 @@ def harris_corners(img, window_size=3, k=0.04):
     Ixy = Ix*Iy
     Iyy = Iy**2
 
-    # STEP 3: Apply a filter to weighted derivatives
+    # STEP 3: Apply a filter (uniform here for simplicity) to weighted derivatives to obtain a smooth representation
+    # of gradient changes over the window
     kernel_value = 1 / window_size*window_size
     kernel = np.full((window_size, window_size), kernel_value)
     Sxx = filter2d(Ixx, kernel)
     Sxy = filter2d(Ixy, kernel)
     Syy = filter2d(Iyy, kernel)
 
-    # STEP 4: Compute corner response R=Det(M)-k(Trace(M)^2) at each pixel
+    # STEP 4: Compute the Harris corner response at each pixel. The formula assesses the likelihood of a pixel being
+    # a corner based on the local gradient distribution
     detM = Sxx * Syy - Sxy**2
     traceM = Sxx + Syy
     response = detM - k * traceM**2
+
     return response
 
 
@@ -54,7 +58,7 @@ def main():
     response_thresholded = response > threshold
 
     # Perform non-max suppression by finding peak local maximum
-    coordinates = peak_local_max(response, min_distance=5, threshold_abs=threshold)
+    coordinates = peak_local_max(response, threshold_abs=threshold)
 
     # Visualize results
     plt.figure(figsize=(15, 5))
