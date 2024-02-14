@@ -31,7 +31,7 @@ def harris_corners(img, window_size=3, k=0.04):
 
     # STEP 3: Apply a filter (uniform here for simplicity) to weighted derivatives to obtain a smooth representation
     # of gradient changes over the window
-    kernel_value = 1 / window_size*window_size
+    kernel_value = 1 / (window_size*window_size)
     kernel = np.full((window_size, window_size), kernel_value)
     Sxx = filter2d(Ixx, kernel)
     Sxy = filter2d(Ixy, kernel)
