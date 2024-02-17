@@ -54,7 +54,7 @@ def main():
     response = harris_corners(img)
 
     # Threshold on response
-    threshold = np.max(response) * 0.01
+    threshold = np.max(response) * 0.001
     response_thresholded = response > threshold
 
     # Perform non-max suppression by finding peak local maximum
