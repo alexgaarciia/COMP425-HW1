@@ -56,7 +56,7 @@ def zero_pad(image, pad_height, pad_width):
         # If the image is color, the process is similar but includes an additional dimension for the color channels.
         out = np.zeros((H+2*pad_height, W+2*pad_width, 3))
         out[pad_height: H+pad_height, pad_width: W+pad_width, :] = image        
-    
+
     return out
 
 
@@ -101,6 +101,7 @@ def filter2d(image, filter):
             for m in range(Hi):
                 for n in range(Wi):
                     out[m, n, c] = np.sum(image_padded[m:m+filter.shape[0], n:n+filter.shape[1]] * filter)
+
     return out
 
 
@@ -128,6 +129,7 @@ def partial_x(img):
     # where each pixel value is the result of the kernel application, representing the gradient magnitude in the
     # x-direction at that point.
     out = filter2d(img, kernel_x)
+
     return out
 
 
@@ -155,4 +157,5 @@ def partial_y(img):
     # where each pixel value is the result of the kernel application, representing the gradient magnitude in the
     # y-direction at that point.
     out = filter2d(img, kernel_y)
+
     return out
